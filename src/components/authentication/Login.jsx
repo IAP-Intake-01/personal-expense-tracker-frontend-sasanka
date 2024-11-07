@@ -12,8 +12,6 @@ import Container from "@mui/material/Container";
 import { useState } from "react";
 import instance from "../../services/AxiosOrder";
 
-
-
 const PaperContainer = styled("div")(({ theme }) => ({
   marginTop: theme.spacing(8),
   display: "flex",
@@ -32,33 +30,39 @@ const FormStyled = styled("form")(({ theme }) => ({
 }));
 
 export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(""); // Error state
 
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    
-    function loginAction(){
-      instance.post('login',{
-        identifier:email,
-        password:password,
+  function loginAction() {
+    setError(""); // Reset error message before each login attempt
+    instance
+      .post("login", {
+        identifier: email,
+        password: password,
       })
-      .then(function (responce){
-        console.log(responce);
-        localStorage.setItem('expense-tracker-token', responce.data.token);
+      .then(function (response) {
+        console.log(response);
+        localStorage.setItem("expense-tracker-token", response.data.token);
         window.location.reload();
       })
-      .catch(function(error){
-        console.log(error)
-      })
+      .catch(function (error) {
+        if (error.response && error.response.status === 401) {
+          // Handle invalid credentials
+          setError("Invalid email or password"); // Set error message if login fails
+        } else {
+          setError("Something went wrong. Please try again."); // Generic error message
+        }
+        console.log(error);
+      });
+  }
 
-    }
-  
-    
   return (
-    <div style={{marginTop:'140px'}}>
-      <Container component="main" maxWidth="xs">                
+    <div style={{ marginTop: "140px" }}>
+      <Container component="main" maxWidth="xs">
         <CssBaseline />
         <PaperContainer>
-          <AvatarStyled sx={{bgcolor:'#0d47a1'}}>
+          <AvatarStyled sx={{ bgcolor: "#0d47a1" }}>
             <LockOutlinedIcon />
           </AvatarStyled>
           <Typography component="h1" variant="h5">
@@ -66,7 +70,7 @@ export default function Login() {
           </Typography>
           <FormStyled noValidate>
             <TextField
-              onChange={(val)=>setEmail(val.target.value)}
+              onChange={(val) => setEmail(val.target.value)}
               variant="outlined"
               margin="normal"
               required
@@ -78,7 +82,7 @@ export default function Login() {
               autoFocus
             />
             <TextField
-              onChange={(val)=>setPassword(val.target.value)}
+              onChange={(val) => setPassword(val.target.value)}
               variant="outlined"
               margin="normal"
               required
@@ -93,13 +97,17 @@ export default function Login() {
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
             />
+            {error && (
+              <Typography color="error" variant="body2" align="center" sx={{ marginBottom: 2 }}>
+                {error}
+              </Typography>
+            )}
             <Button
-              onClick={()=> loginAction()}
+              onClick={() => loginAction()}
               fullWidth
               variant="contained"
               color="primary"
               sx={{ marginTop: 3, marginBottom: 1 }} // Using the sx prop for styles
-           
             >
               Log In
             </Button>
@@ -110,7 +118,7 @@ export default function Login() {
                 alignItems: "center",
               }}
             >
-              <p> {'Don&apos;t have an account? Go to' }</p>
+              <p> {"Don&apos;t have an account? Go to"}</p>
               <Link href="/register" variant="body2">
                 {"  ."}{" Register"}
               </Link>

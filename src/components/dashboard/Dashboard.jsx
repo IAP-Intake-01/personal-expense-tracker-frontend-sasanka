@@ -1,21 +1,26 @@
-import PropTypes from 'prop-types';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import { createTheme } from '@mui/material/styles';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import { AppProvider } from '@toolpad/core/AppProvider';
-import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { useDemoRouter } from '@toolpad/core/internal';
+import Box from "@mui/material/Box";
+import { createTheme } from "@mui/material/styles";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import { AppProvider } from "@toolpad/core/AppProvider";
+import { DashboardLayout } from "@toolpad/core/DashboardLayout";
+import { useDemoRouter } from "@toolpad/core/internal";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import DescriptionIcon from "@mui/icons-material/Description";
-import AddCircleIcon from "@mui/icons-material/AddCircle"; 
-import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
-import AddExpenses from "../forms/AddExpenseForm"; 
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
+import AddExpenses from "../forms/AddExpenseForm";
+import DataTable from "../forms/ExpensesTable";
+import PieChartCatagory from "../charts/CategoryPieChart";
+import SignOut from "../../common/components/SignOut";
+import { Navigate, Route, Routes } from "react-router-dom";
+import Typography from "@mui/material/Typography";
+import TableChartIcon from '@mui/icons-material/TableChart';
+import MonthBarChart from "../charts/MonthlyBarChart";
 
 const NAVIGATION = [
   {
-    segment: 'dashboard',
-    title: 'Dashboard',
+    segment: "dashboard",
+    title: "Dashboard",
     icon: <DashboardIcon />,
   },
   {
@@ -24,18 +29,23 @@ const NAVIGATION = [
     icon: <AddCircleIcon />,
   },
   {
+    segment: "data-table",
+    title: "Data Table",
+    icon: <TableChartIcon />,
+  },
+  {
     segment: "reports",
     title: "Reports",
     icon: <BarChartIcon />,
     children: [
       {
-        segment: "login",
-        title: "Login",
+        segment: "catagory",
+        title: "Month Expenses for Category",
         icon: <DescriptionIcon />,
       },
       {
-        segment: "register",
-        title: "Register",
+        segment: "month-expenses",
+        title: "Month Expenses Chart",
         icon: <DescriptionIcon />,
       },
     ],
@@ -44,7 +54,7 @@ const NAVIGATION = [
 
 const demoTheme = createTheme({
   cssVariables: {
-    colorSchemeSelector: 'data-toolpad-color-scheme',
+    colorSchemeSelector: "data-toolpad-color-scheme",
   },
   colorSchemes: { light: true, dark: true },
   breakpoints: {
@@ -58,61 +68,74 @@ const demoTheme = createTheme({
   },
 });
 
-function DemoPageContent({ pathname }) {
-  return (
-    <Box
-      sx={{
-        py: 4,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        textAlign: 'center',
-      }}
-    >
-      <Typography>Dashboard content for {pathname}</Typography>
-    </Box>
-  );
-}
-
-DemoPageContent.propTypes = {
-  pathname: PropTypes.string.isRequired,
-};
-
-function Dashboard(props) {
-  const { window } = props;
-
-  const router = useDemoRouter('/dashboard');
-
-  const demoWindow = window !== undefined ? window() : undefined;
+function DashboardContent() {
+  const router = useDemoRouter("");
 
   return (
     <AppProvider
       navigation={NAVIGATION}
       branding={{
         logo: (
-          <div style={{ margin: '3px', marginRight:'15px', display: 'flex', alignItems: 'center' }}>
-            <CurrencyExchangeIcon fontSize="large" style={{ color: '#1976d2' }} />
-          </div>
+          <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+            <div
+              style={{
+                margin: "3px",
+                marginRight: "15px",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <CurrencyExchangeIcon
+                fontSize="large"
+                style={{ color: "#1976d2" }}
+              />
+            </div>
+
+            <Typography
+              variant="h6"
+              style={{ fontWeight: "bold", color: "#1976d2" }}
+            >
+              Personal Expenses Tracker
+            </Typography>
+          </Box>
         ),
-        title: 'Personal Expenses Tracker',
+        title: (
+          <Box
+            sx={{ display: "flex", alignItems: "center", marginLeft: "auto" }}
+          >
+            <Box sx={{ mr: "auto" }}>
+              <SignOut />
+            </Box>
+          </Box>
+        ),
       }}
       router={router}
       theme={demoTheme}
-      window={demoWindow}
     >
       <DashboardLayout>
-        {router.pathname === "/expenses" ? (
-          <AddExpenses /> // Render AddExpenses component when on /expenses route
-        ) : (
-          <DemoPageContent pathname={router.pathname} />
-        )}
+        {router.pathname === "/dashboard" && <Typography>Dashboard Overview</Typography>}
+        {router.pathname === "/expenses" && <AddExpenses />}
+        {router.pathname === "/data-table" && <DataTable />}
+        {router.pathname === "/reports/catagory" && <PieChartCatagory />}
+        {router.pathname === "/reports/month-expenses" && <MonthBarChart />}
       </DashboardLayout>
     </AppProvider>
   );
 }
 
-Dashboard.propTypes = {
-  window: PropTypes.func,
-};
+function Dashboard() {
+  return (
+    <Box>
+      <Routes>
+        <Route path="/dashboard" element={<DashboardContent />} />
+        <Route path="/expenses" element={<AddExpenses />} />
+        <Route path="/data-table" element={<DataTable />} />
+        <Route path="/reports/catagory" element={<PieChartCatagory />} />
+        <Route path="/reports/month-expenses" element={<MonthBarChart />} />
+        <Route path="*" element={<Navigate to="/dashboard" />} />
+      </Routes>
+    </Box>
+  );
+}
 
 export default Dashboard;
