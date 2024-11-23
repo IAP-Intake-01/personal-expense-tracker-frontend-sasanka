@@ -25,16 +25,20 @@ instance.interceptors.response.use(
   },
   (error) => {
     if (error.response && error.response.status === 401) {
-
       if (!window.location.pathname.includes("/login") && !window.location.pathname.includes("/register")) {
         alert("Session expired. Please log in again to continue.");
         localStorage.removeItem('expense-tracker-token');
-        window.location.href = "/login";
+        
+        // Set a short delay to redirect after alert
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 100); // 100 milliseconds
       }
     }
     return Promise.reject(error);
   }
 );
+
 
 
 export default instance;

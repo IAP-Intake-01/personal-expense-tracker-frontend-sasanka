@@ -34,22 +34,17 @@ const NAVIGATION = [
     icon: <TableChartIcon />,
   },
   {
-    segment: "reports",
-    title: "Reports",
-    icon: <BarChartIcon />,
-    children: [
-      {
-        segment: "catagory",
-        title: "Month Expenses for Category",
-        icon: <DescriptionIcon />,
-      },
-      {
-        segment: "month-expenses",
-        title: "Month Expenses Chart",
-        icon: <DescriptionIcon />,
-      },
-    ],
+    segment: "catagory",
+    title: "Month Expenses for Category",
+    icon: <DescriptionIcon />,
   },
+  {
+    segment: "month-expenses",
+    title: "Month Expenses Chart",
+    icon: <BarChartIcon />,
+  },
+
+
 ];
 
 const demoTheme = createTheme({
@@ -103,9 +98,10 @@ function DashboardContent() {
           <Box
             sx={{ display: "flex", alignItems: "center", marginLeft: "auto" }}
           >
-            <Box sx={{ mr: "auto" }}>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
               <SignOut />
             </Box>
+
           </Box>
         ),
       }}
@@ -113,11 +109,17 @@ function DashboardContent() {
       theme={demoTheme}
     >
       <DashboardLayout>
-        {router.pathname === "/dashboard" && <Typography>Dashboard Overview</Typography>}
-        {router.pathname === "/expenses" && <AddExpenses />}
-        {router.pathname === "/data-table" && <DataTable />}
-        {router.pathname === "/reports/catagory" && <PieChartCatagory />}
-        {router.pathname === "/reports/month-expenses" && <MonthBarChart />}
+        {router.pathname === "/dashboard" || router.pathname === "/" ? (
+          <DataTable />
+        ) : router.pathname === "/expenses" ? (
+          <AddExpenses />
+        ) : router.pathname === "/data-table" ? (
+          <DataTable />
+        ) : router.pathname === "/catagory" ? (
+          <PieChartCatagory />
+        ) : router.pathname === "/month-expenses" ? (
+          <MonthBarChart />
+        ) : null}
       </DashboardLayout>
     </AppProvider>
   );

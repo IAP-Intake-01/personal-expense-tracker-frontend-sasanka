@@ -13,13 +13,14 @@ export default function PieChartCategory() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await instance.get("get-expenses-by-category");
+        const response = await instance.get("expenses-current-month");
 
         const formattedData = response.data.map((expense) => ({
           id: expense.category,
           value: expense.total_amount,
           label: expense.category,
         }));
+
         setExpensesData(formattedData);
       } catch (error) {
         console.error("Failed to fetch expenses data:", error);
@@ -30,7 +31,7 @@ export default function PieChartCategory() {
   }, []);
 
   const handleClick = (event, itemIdentifier, item) => {
-    setSelectedExpense(item); 
+    setSelectedExpense(item); // Display details of selected category
   };
 
   return (
